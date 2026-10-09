@@ -1,0 +1,12 @@
+const router = require("express").Router();
+const controller = require("../controllers/productController");
+const { requireAuth, requireRole } = require("../middleware/authMiddleware");
+router.get("/", controller.list);
+router.get("/farmer/my-products", requireAuth, requireRole("farmer"), controller.mine);
+router.get("/admin/all", requireAuth, requireRole("admin"), controller.adminList);
+router.get("/:id", controller.getOne);
+router.post("/", requireAuth, requireRole("farmer"), controller.create);
+router.put("/:id", requireAuth, requireRole("farmer"), controller.update);
+router.delete("/:id", requireAuth, requireRole("farmer"), controller.remove);
+router.delete("/:id/admin", requireAuth, requireRole("admin"), controller.adminRemove);
+module.exports = router;

@@ -1,0 +1,9 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { getMyOrders } from "../services/api";
+
+export default function Orders() {
+  const [orders, setOrders] = useState([]); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
+  useEffect(() => { getMyOrders().then(({ orders }) => setOrders(orders)).catch((err) => setError(err.message)).finally(() => setLoading(false)); }, []);
+  return <section className="container-page py-12"><div className="flex items-end justify-between"><div><p className="font-semibold text-farm-600">Purchase history</p><h1 className="section-title mt-1">My orders</h1></div><Link to="/products" className="btn-secondary hidden sm:inline-flex">Continue Shopping</Link></div><div className="mt-8 space-y-4">{loading ? <p className="text-slate-500">Loading orders...</p> : error ? <div className="card p-6 text-red-600">{error}</div> : orders.length ? orders.map((order) => <div className="card p-5" key={order._id}><div className="flex flex-col gap-4 sm:flex-row sm:items-center"><div className="flex-1"><p className="text-sm text-slate-500">Order #{order.orderNumber || order._id.slice(-6).toUpperCase()}</p><h3 className="mt-1 font-bold">{order.items.map((item) => item.name).join(", ")}</h3><p className="text-sm text-slate-500">{order.items.map((item) => `${item.quantity} × ${item.name} (${item.status || "Processing"})`).join(" · ")} · {new Date(order.createdAt).toLocaleDateString()}</p><p className="mt-1 text-sm text-slate-500">Payment: {order.paymentMethod?.toUpperCase()} · {order.paymentStatus || "Pending"}</p></div><p className="font-bold">₹{order.total.toLocaleString("en-IN")}</p><span className="rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold text-yellow-700">{order.status}</span></div></div>) : <div className="card p-12 text-center text-slate-500">You have not placed any orders yet.</div>}</div></section>;
+}
